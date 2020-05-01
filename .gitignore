@@ -3,3 +3,4 @@
 *.png
 .stack-work
 stack.yaml.lock
+server
