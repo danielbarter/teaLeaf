@@ -33,10 +33,10 @@ typedef struct _bmp_header
 
 typedef struct _bmp_pixel
 {
-	unsigned char alpha;
+  unsigned char blue;
 	unsigned char green;
 	unsigned char red;
-  unsigned char blue;
+	unsigned char alpha;
 } bmp_pixel;
 
 
@@ -59,12 +59,12 @@ int32_t main(int32_t argc, char **argv)
   fftw_complex *teaLeaf;
   int i;
   uint32_t seed = 0;
-  uint32_t *input_array = (uint32_t *) argv[1];
+  uint8_t *input_array = (uint8_t *) argv[1];
   size_t length = strlen(argv[1]);
 
-  for (i = 0; i < length / 4; ++i)
+  for (i = 0; i < length; ++i)
     {
-      seed = seed + input_array[i];
+      seed = seed + (uint32_t)input_array[i];
     }
 
   teaLeaf = generateTeaLeaf(seed);
@@ -91,20 +91,19 @@ int32_t main(int32_t argc, char **argv)
     {
           if ( teaLeaf[i][0] > NUM_PIXELS * NUM_PIXELS / 2 )
             {
-              image[i].blue = (unsigned char)255;
-              image[i].green = (unsigned char)255;
-              image[i].red = (unsigned char)255;
-              image[i].alpha = (unsigned char)0;
+              image[i].blue = (uint8_t)0xf9;
+              image[i].green = (uint8_t)0x66;
+              image[i].red = (uint8_t)0x54;
+              image[i].alpha = (uint8_t)255;
             } else
             {
-              image[i].blue = (unsigned char)0;
-              image[i].green = (unsigned char)0;
-              image[i].red = (unsigned char)0;
-              image[i].alpha = (unsigned char)0;
+              image[i].blue = (uint8_t)255;
+              image[i].green = (uint8_t)255;
+              image[i].red = (uint8_t)255;
+              image[i].alpha = (uint8_t)127;
             }
     }
-
-  FILE *img_file = fopen("test.bmp","w");
+  FILE *img_file = fopen("tealeaf.bmp","w");
   fwrite((void *) &header, sizeof(bmp_header),1,img_file);
   i = fwrite((void *) image, sizeof(bmp_pixel)*NUM_PIXELS*NUM_PIXELS,1,img_file);
 
