@@ -23,4 +23,4 @@ app request respond = do
 
 main :: IO ()
 main = do
-    run 8080 app
+    run 80 app
