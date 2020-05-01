@@ -12,6 +12,7 @@ import System.Process (callProcess)
 
 app :: Application
 app request respond = do
+  putStrLn $ show $ remoteHost request
   let queryString = "tealeaf::" <> ( unpack $ rawQueryString request )
   callProcess "./generateTeaLeaf.elf" [queryString]
   callProcess "convert" ["tealeaf.bmp","tealeaf.png"]
