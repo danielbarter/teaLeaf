@@ -2,48 +2,47 @@
 #include <stdbool.h>
 #include <fftw3.h>
 #include <stdint.h>
-
-
-// the bmp header needs to be packed
-#define PACKED __attribute__((packed))
+#include "libbmp/libbmp.h"
 
 
 
 // SQUARES ARE AESTHETIC
-#define NUM_PIXELS 100
+#define NUM_PIXELS 420
 #define FREQUENCY_CUTOFF 5
 
-
-typedef struct PACKED bit_map_file_header {
-  uint16_t bfType; //starts at 0, 2 bytes long
-  uint32_t bfSize; //starts at 2, 4 bytes long
-  uint16_t bfReserved1; //starts at 6, 2 bytes long
-  uint16_t bfReserved2; //starts at 8, 2 bytes long
-  uint32_t bfOffBits; //starts at 10, 4 bytes long
-} bit_map_file_header;
-
-typedef struct PACKED bit_map_info_header {
-  uint32_t biSize;//starts at 14
-  int32_t  biWidth;//starts at 18
-  int32_t  biHeight;//starts at 22
-  uint16_t biPlanes;//starts at 26
-  uint16_t biBitCount;//starts at 28
-  uint32_t biCompression;//starts at 30
-  uint32_t biSizeImage;//starts at 34
-  int32_t  biXPelsPerMeter;
-  int32_t  biYPelsPerMeter;
-  uint32_t biClrUsed;
-  uint32_t biClrImportant;
-} bit_map_info_header;
 
 fftw_complex *generateTeaLeaf(uint32_t seed);
 bool masked(uint32_t row, uint32_t column);
 
 
-
 int32_t main(int32_t argc, char **argv)
 {
-  fftw_complex *teaLeaf = generateTeaLeaf(42);
+  fftw_complex *teaLeaf;
+  bmp_img img;
+  int i, j;
+
+
+  teaLeaf = generateTeaLeaf(43);
+
+  bmp_img_init_df(&img, NUM_PIXELS, NUM_PIXELS);
+
+  for (i = 0; i < NUM_PIXELS; ++i)
+    {
+      for (j = 0; j < NUM_PIXELS; ++j)
+        {
+          if ( teaLeaf[i * NUM_PIXELS + j][0] > NUM_PIXELS * NUM_PIXELS / 2 )
+            {
+              bmp_pixel_init (&img.img_pixels[i][j], 250, 250, 250);
+            } else
+            {
+              bmp_pixel_init (&img.img_pixels[i][j], 0, 0, 0);
+            }
+        }
+    }
+
+  bmp_img_write (&img, "test.bmp");
+	bmp_img_free (&img);
+
   return 0;
 }
 
