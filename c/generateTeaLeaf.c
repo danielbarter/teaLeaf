@@ -1,5 +1,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
+#include <stdio.h>
+#include <string.h>
 #include <fftw3.h>
 #include <stdint.h>
 
@@ -46,10 +48,26 @@ bool masked(uint32_t row, uint32_t column);
 
 int32_t main(int32_t argc, char **argv)
 {
+
+  if (argc != 2)
+    {
+      puts("usage: generateTeaLeaf.elf (argument)");
+      puts("expected one argument");
+      return 1;
+    }
+
   fftw_complex *teaLeaf;
   int i;
+  uint32_t seed = 0;
+  uint32_t *input_array = (uint32_t *) argv[1];
+  size_t length = strlen(argv[1]);
 
-  teaLeaf = generateTeaLeaf(3782);
+  for (i = 0; i < length / 4; ++i)
+    {
+      seed = seed + input_array[i];
+    }
+
+  teaLeaf = generateTeaLeaf(seed);
   bmp_pixel image[NUM_PIXELS * NUM_PIXELS];
   bmp_header header =
     { .bfheader = 0x4D42,
