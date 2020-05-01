@@ -53,7 +53,7 @@ int32_t main(int32_t argc, char **argv)
   bmp_pixel image[NUM_PIXELS * NUM_PIXELS];
   bmp_header header =
     { .bfheader = 0x4D42,
-      .bfSize = sizeof(bmp_header) + NUM_PIXELS * NUM_PIXELS,
+      .bfSize = sizeof(bmp_header) + NUM_PIXELS * NUM_PIXELS * sizeof(bmp_pixel),
       .bfReserved = 0,
       .bfOffBits = sizeof(bmp_header),
       .biSize = 40,
