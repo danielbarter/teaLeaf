@@ -2,13 +2,42 @@
 #include <stdbool.h>
 #include <fftw3.h>
 #include <stdint.h>
-#include "libbmp/libbmp.h"
 
-
+#define PACKED __attribute__((packed))
 
 // SQUARES ARE AESTHETIC
 #define NUM_PIXELS 420
 #define FREQUENCY_CUTOFF 5
+
+
+typedef struct _bmp_header
+{
+  uint16_t                bfheader; // 0
+	uint32_t                bfSize;  // 2
+	uint32_t                bfReserved; // 6
+	uint32_t                bfOffBits; // 10
+	uint32_t                biSize; // 14
+	int32_t                 biWidth; // 18
+	int32_t                 biHeight; // 22
+	uint16_t                biPlanes; // 26
+	uint16_t                biBitCount; // 28
+	uint32_t                biCompression; // 30
+	uint32_t                biSizeImage; // 34
+	int32_t                 biXresolution; // 38
+	int32_t                 biYresolution; // 42
+	uint32_t                biColorUsed; // 46
+	uint32_t                biColorImportant; // 50
+} PACKED bmp_header;
+
+typedef struct _bmp_pixel
+{
+	unsigned char alpha;
+	unsigned char green;
+	unsigned char red;
+  unsigned char blue;
+} bmp_pixel;
+
+
 
 
 fftw_complex *generateTeaLeaf(uint32_t seed);
@@ -18,30 +47,48 @@ bool masked(uint32_t row, uint32_t column);
 int32_t main(int32_t argc, char **argv)
 {
   fftw_complex *teaLeaf;
-  bmp_img img;
-  int i, j;
-
+  int i;
 
   teaLeaf = generateTeaLeaf(43);
+  bmp_pixel image[NUM_PIXELS * NUM_PIXELS];
+  bmp_header header =
+    { .bfheader = 0x4D42,
+      .bfSize = sizeof(bmp_header) + NUM_PIXELS * NUM_PIXELS,
+      .bfReserved = 0,
+      .bfOffBits = sizeof(bmp_header),
+      .biSize = 40,
+      .biWidth = NUM_PIXELS,
+      .biHeight = NUM_PIXELS,
+      .biPlanes = 1,
+      .biBitCount = 32,
+      .biCompression = 0,
+      .biSizeImage = NUM_PIXELS * NUM_PIXELS,
+      .biXresolution = 0,
+      .biYresolution = 0,
+      .biColorUsed = 0,
+      .biColorImportant = 0
+    };
 
-  bmp_img_init_df(&img, NUM_PIXELS, NUM_PIXELS);
-
-  for (i = 0; i < NUM_PIXELS; ++i)
+  for (i = 0; i < NUM_PIXELS * NUM_PIXELS; ++i)
     {
-      for (j = 0; j < NUM_PIXELS; ++j)
-        {
-          if ( teaLeaf[i * NUM_PIXELS + j][0] > NUM_PIXELS * NUM_PIXELS / 2 )
+          if ( teaLeaf[i][0] > NUM_PIXELS * NUM_PIXELS / 2 )
             {
-              bmp_pixel_init (&img.img_pixels[i][j], 250, 250, 250);
+              image[i].blue = (unsigned char)255;
+              image[i].green = (unsigned char)255;
+              image[i].red = (unsigned char)255;
+              image[i].alpha = (unsigned char)0;
             } else
             {
-              bmp_pixel_init (&img.img_pixels[i][j], 0, 0, 0);
+              image[i].blue = (unsigned char)0;
+              image[i].green = (unsigned char)0;
+              image[i].red = (unsigned char)0;
+              image[i].alpha = (unsigned char)0;
             }
-        }
     }
 
-  bmp_img_write (&img, "test.bmp");
-	bmp_img_free (&img);
+  FILE *img_file = fopen("test.bmp","w");
+  fwrite((void *) &header, sizeof(bmp_header),1,img_file);
+  i = fwrite((void *) image, sizeof(bmp_pixel)*NUM_PIXELS*NUM_PIXELS,1,img_file);
 
   return 0;
 }
