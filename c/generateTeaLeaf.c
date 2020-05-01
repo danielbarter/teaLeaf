@@ -49,7 +49,7 @@ int32_t main(int32_t argc, char **argv)
   fftw_complex *teaLeaf;
   int i;
 
-  teaLeaf = generateTeaLeaf(43);
+  teaLeaf = generateTeaLeaf(3782);
   bmp_pixel image[NUM_PIXELS * NUM_PIXELS];
   bmp_header header =
     { .bfheader = 0x4D42,
