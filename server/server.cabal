@@ -19,3 +19,4 @@ executable server
                      , http-types
                      , bytestring
                      , process
+                     , unix
