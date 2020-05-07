@@ -100,7 +100,7 @@ int32_t main(int32_t argc, char **argv)
               image[i].blue = (uint8_t)255;
               image[i].green = (uint8_t)255;
               image[i].red = (uint8_t)255;
-              image[i].alpha = (uint8_t)127;
+              image[i].alpha = (uint8_t)0;
             }
     }
   FILE *img_file = fopen("tealeaf.bmp","w");
