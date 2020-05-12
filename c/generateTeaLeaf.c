@@ -105,7 +105,7 @@ int32_t main(int32_t argc, char **argv)
     }
   FILE *img_file = fopen("tealeaf.bmp","w");
   fwrite((void *) &header, sizeof(bmp_header),1,img_file);
-  i = fwrite((void *) image, sizeof(bmp_pixel)*NUM_PIXELS*NUM_PIXELS,1,img_file);
+  fwrite((void *) image, sizeof(bmp_pixel)*NUM_PIXELS*NUM_PIXELS,1,img_file);
 
   return 0;
 }
